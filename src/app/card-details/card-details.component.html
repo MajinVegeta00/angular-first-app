@@ -1,0 +1,53 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col d-flex justify-content-center align-items-center">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-tittle">
+            <h4 class="card-title"><b>Detalles del Post </b></h4>
+          </div>
+          <br />
+          <h5 class="card-title"><b>Nombre: </b>{{ details.name }}</h5>
+          <h5 class="card-title">
+            <b>Descripcion: </b>{{ details.description }}
+          </h5>
+          <hr />
+          <h4 class="card-title"><b>Autor </b></h4>
+          <h5 class="card-title"><b>Nombre: </b>{{ details.user.name }}</h5>
+          <h5 class="card-title"><b>Correo: </b>{{ details.user.email }}</h5>
+          <h5 class="card-title"><b>Telefono: </b>{{ details.user.phone }}</h5>
+        </div>
+
+        <form [formGroup]="form" (submit)="onSend()">
+          <textarea
+            name=""
+            id=""
+            cols="30"
+            rows="5"
+            placeholder="Agregue un comentario al post"
+            formControlName="comment"
+          ></textarea>
+          <button class="btn btn-primary">Publicar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <h4><b>Comentarios</b></h4>
+  <hr />
+  <div *ngIf="comments.length > 0; else elseBlock">
+    <div class="">
+      <div class="card mb-4" *ngFor="let item of comments">
+        <div class="card-tittle">
+          <h4><b>Comentario numero: </b>{{ item.id }}</h4>
+          <h5><b>Texto: </b>{{ item.comment }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #elseBlock> 
+    <h4>Nadie ha comentado este post</h4>
+  </ng-template>
+</div>

@@ -1,0 +1,200 @@
+*Un componente en angular esta conformado por un bloque  que tiene un archivo css, uno ts y otro html
+ Como generar un componente en Angular cli?
+   ng generate component name
+
+*Una vez generamos el componente, este automaticamente se importa en el archivo app.module.ts
+ dento de @NgModule en el objeto de declarations
+   nota: @NgModule contiene las dependencias de la aplicacion 
+ Luego de esto solo basta usar el nombre del selector del componente en el app.component.html,invocandolo 
+ como elemento html(en forma de etiqueta no autocerrada) y este se mostrara en el dom   
+
+*Cada archivo de componente ts tiene una estructura basica   
+ -@Component({
+  selector: 'app-sidebar', =====>  nombre con el que tenemos que invocar a nuestro componente en donde se requiera
+  templateUrl: './sidebar.component.html', ======> ruta para cargar la estructura html del componente
+  styleUrls: ['./sidebar.component.css']  =======> ruta para cargar los estilos del componente
+})
+ -Dentro de la sintaxis de exportacion se definen las propiedaddes del componente.Estas tienen que inicializarse
+ dentro del contructor
+
+
+
+*Funciones de los componentes en Angular 
+-ngOnInit():datoQueRegresa{} ======>Ejecuta una funcion o logica cuando el componente se contruye
+  nota:Para ue funcione es necesario poner a implementar estas funciones en la sintaxis de exportacion
+       de la clase.Ejemplo ==> export class NameClass implements OnInit
+
+*Directivas de Angular:Se utilizan en el template(HTML)
+- *ngFor="let item of items"===>Para  recorrer y construir componentes o elementos html en dependencia de un array definido como propiedad
+   en el componente
+- (click)="metodo()" ===>Para ejecutar un metodo de un componete  
+- if-else:En este ejemplo, condition es una expresión booleana que determina si se muestra el contenido dentro del  
+          primer div o el contenido dentro de elseBlock. Si condition es true, se mostrará el contenido dentro del 
+          primer div. Si condition es false, se mostrará el contenido dentro de elseBlock.
+          =====> <div *ngIf="condition; else elseBlock">
+                    <!-- Contenido si la condición es verdadera -->
+                 </div>
+                 <ng-template #elseBlock>
+                 <!-- Contenido si la condición es falsa -->
+                 </ng-template> 
+-binding 
+    1- Enlace de propiedad ([ ]): Puedes enlazar una propiedad del componente con una propiedad de un elemento HTML utilizando la sintaxis de enlace de propiedad. Por ejemplo:
+       html
+        ===><input [value]="nombre">
+       Aquí, la propiedad value del <input> se enlaza con la propiedad nombre del componente, lo que permite que el valor se refleje en ambos lados.
+    2-Enlace de clase ([class]): Puedes enlazar una clase CSS condicionalmente a un elemento HTML utilizando el enlace de clase. Por ejemplo:
+      html
+       ======><div [class.destacado]="esDestacado">Contenido</div>
+      Aquí, la clase destacado se aplicará al <div> si la propiedad esDestacado del componente es true.
+
+
+*Como enviar datos de un componente padre a un componente hijo(props)
+ Para estas acciones , Angular tiene unos decoradores llamados Input y Output 
+ -Input: 
+   1: Se define en el componente que va a recibir las propiedades o datos.Primero se importa Input de 
+      'angular/core' y luego se inicializa junto con las demas propiedades del componente de la siguiente manera:
+      ==> @Input() nombreDeseado:any
+  Any se usa para indicar que puede recibir cualquier tipo de dato.
+   2: Luego de esto, en la invocacion del componente hijo dentro del componente padre se le pasan las propiedades de la siguiente manera
+      <componente-hijo [nombreDeseado]="valor"></componente-hijo>
+   3: Para que estas propiedades se pinten en el componente hijo se debe acceder a ellas a traves de
+      desesctructuracion de la siguiente manera
+      ===> <h1>{{ nombreDeseado.propiedad }}</h1>
+
+ *Como enviar datos de un componente a otro sin importar la herencia
+  Para esta accion se utilizan servicios.Los servicios hacen funcion de puentes entre componentes que no se 
+  encuentran emparentados.
+  Los servicios no son mas que un archivo ts con un constructor y con funciones, y este debe ser importado en 
+  los componentes que van a intercambiar informacion
+    1-Como generar un servicio:
+       ===>ng generate service nombre de servicio
+    2-Importando servicio en componentes interesados
+      import {nombreServicio} from 'path'
+    3-Inyectar el servicio dentro de los constructores de las clases interesadas de manera privada,para poder
+      tener acceso a los metodos publicos del servicio de favoritos:
+      constructor(private aliasDeseado:nombreServicio )
+    4-Para hacer que el servivio emita datos de un componetne a otro, hacemos uso del decorador Output.Este decorador
+      lo configuraremos para que sea de tipo emisor de eventos de la siguiente manera
+      =====> import {Output} from "angular/core"
+      Configurando decorador:
+      =====>@Output() nombreDecorador:EventEmitter<any>=new EventEmitter()
+         nota:Este decorador se ve como un metodo de la clase
+    5-Luego a la hora de emitir data desde el componente emisor, simplemente usamos los metodos del servicio y ya esta!!!
+      ====>emitData(){
+        this.aliasDeseado.nombreDecorador.emit(dato)
+      }  
+      nota:En este caso se usa la funcion emit xq el decorador es una unstancia de la clase EventEmitter()
+    6-Para recibir esa data emitida desde el componente emisor, dentro del componente receptor accedemos al servicio y la 
+      obtenemos de la siguiente manera
+      ====> this.aliasDeseado.nombreDecorador.suscribe(data=>// hacer algo con ella)   
+
+ *Para hacer peticiones http con Angular, se puede utilizar un modulo que trae este framework que se llama
+  HttpClientModule.
+     1- Para usarlo primero debemos importarlo en app.module.ts y luego incluirlo en @NgModules en el
+      objeto de imports
+       ===> import { HttpClientModule } from '@angular/common/http'
+       ===> imports: [
+           HttpClientModule
+           ]
+     2- Luego creamos un servicio que contendra toda la logica de las solicitudes HTTP.Importamos en este servicio
+        HttpClient(es una clase del modulo HttpClientModule para hacer peticiones) y se lo inyectamos al constructor 
+        del servicio como dependencia de manera privada      
+     3- Una vez hecho esto, solo necesitamos inyectar el servicio en el componente que lo va a consumir y 
+        utilizamos sus funciones para hacer httpRequest   
+
+ *Para madar datos a traves de las rutas necesitmos usar el modulo Router de angular/router.Inyectamos el modulo
+  en el constructor de forma privada y usamos sus metodos.En la clase emisora, una forma de enviar data es la 
+  siguiente
+    ======> const params={id:this.props.id}
+            this.router.navigate(['/card'],{queryParams:params})       
+  Para recibir los parametros en la clase receptora usamos el modulo ActivatedRouter de angular.Lo inyectamos
+  de forma privada en el constructor y para recibir los datos se procede de la siguiente manera   
+   =======> this.route.queryParams.subscribe((params) => {
+            this.id = params['id'];}
+            nota:la forma de acceder a el indicador del objeto que se envia por parametros es a traves de 
+            params['nombreIndicador']
+  
+
+  *Como trabajar con Form Builder (modulo de angular para trabajar y validar formularios de manera reactiva)
+    1-Importamos el modulo  ReactiveFormModule en nuestra app.module.ts y lo incluimos en nuestras imports
+    2-Luego vamos al componente donde tenemos el formulario e importamos los modulos FormBuilder y FormGroup
+      de angular/forms
+    3-Creamos una propiedad de tipo FormGroup para almacenar los datos de los campos de los formularios
+      e inyectamos el modulo FormBuilder en el constructor de la clase
+    4-Dentro en ngOnInit asociamos la propiedad creada de tipo FormGroup con la instancia de FormBuilder inyectada
+      al constructor.
+      ====>this.form=this.formBuilder.group({
+        name:['']
+      })  
+          nota:Esto puede verse como que tenemos una variable de tipo formulario que no se construye pos si sola.Necesita
+               un builder para funcionar 
+    5-Luego, usando el binding de angular asociamos la propiedad formGroup de los formularios con la propiedad form
+      del componente.Conviene enviar datos por el evento submit del formulario
+      =====><form [formGroup]='form' (submit)='onSend()' ></form>            
+    6-Luego, usando el modulo ReactiveFormModule importado en la app, podemos sustituir ngModel para almacenar
+      los datos de los inputs por formControlName='nombre'
+           Nota:Ese nombre que va dentro de formControlName es el atributo de la propiedad form definida con
+                formBuilder donde se desea almacenar el valor
+
+   *Usando librerias de componentes
+       En este proyecto usaremos componentes de una biblioteca llamada Swimlane, que contiene componentes estilados para trabajar 
+       en Angular.La instalamos primero con
+       ====>npm install @swimlane/ngx-datatable
+
+
+   *Implementando un login real con Angular con cookies y api rest         
+     Primero debemos implementar guardianes en las rutas para evitar el paso de usuarios no autenticados.Para ello
+     Angular cuenta con 4 tipos de guardianes:
+        -CanActivate: Verificar acceso a una pagina determinada    
+        -CanActivateChild: Verificar acceso a las rutas hijas de una ruta determinada
+        -CanDeactivate: Para decidir que hacer si el usuario desea abandonar una determinada ruta
+        -CanLoad: Para evitaar que la aplicacion cargue modulos de manera perezosa si el usuario no esta 
+         actualizado
+     1-Como generar un guardian?
+     ======>ng generate guard nombre
+     2-Debemos utilizar en el guardian le Route de Angular y un manejador de cookies.En este caso se utilizo
+     ======>  ngx-cookie-service
+             Nota: Para usar estos servicios, se tienen que inyectar en el constructor de la clase
+     ======> npm install ngx-cookie-service-ssr --save
+     3- Luego en nuestra app.module.ts lo importamos como provider
+     4- Una vez estamos en el guardian que genero Angular, en dependencia del tipo de guardian vemos un metodo
+        con el mismo nombre.Este metodo devuelve un true cuando las condiciones son las optimas para dejar 
+        pasar al usuario.De lo contrario no.          
+            Nota:En angular 16 los guard no son class guard, sino functional guard.Las dependencias que necesitemos
+                 usar en ese tienen que inyectarse a partir del modulo inject de angular/core    
+
+  *Implementando pipetas(pipes) en Angular    
+    Para dar salida a los datos en el DOM
+      Ejemplos:
+      ====>  String  
+               1 "Expresion" | uppercase
+               2 "Expresion" | lowercase
+             Moneda
+               1 Numero | currency =>Por defecto pone simbolo de $
+               2 Numero | currency:'L.' =>Forma de enviarle un parametro a un filtro.En vez de poner $ pone L. 
+             Numero
+               1 Numero | number =>Le da un formato para mejorar legibilidad            
+
+  *Como subir imagenes a un servidor desde Angular            
+     Para este ejemplo utilizaremos la carga de una miniatura a la hora de seleccionar la imagen para enviarla
+     al backend.Para lograr esto necesitamos convertir la imagen a base64, ya que esta codificacion es la que nos 
+     permite realizar la previzualizacion de la imagen en el dom
+
+  *Para que se utilizan las directivas en angular?
+     Las directivas en angular son utilizadas para extender la funcionalidad del HTML para prooveer una mejor
+     experiencia de usuario, como para mostrar una imagen predefinida cuando no carga un recurso o imagen, una
+     pagina no encontrada etc
+   -Como generar una directiva?    
+     ====>ng generate directive nombre
+   -En las directivas podemos utilizar un modulo de angular/core llamado ElementRef para crear una instancia de el.
+    Con esto, al incluir la directiva en un elemento de un componente podemos ver y manipular este elemento 
+    a conveniencia (ver directiva broken-img y componente card) 
+   -Un decorador que podria utilizarse en una directiva como esta es @HostListener('error').Este decorador se dispara
+    si el elemento del DOM en el que se esta acoplando la directiva, presenta un error(en este caso xq recibe 'error'
+    como parametro).Por ejemplo, un enlace de imagen roto (Ver directiva broken img).Podemos ver como se dispara 
+    si modificamos la ruta de la imagen
+       Nota:Para poder vigilar los elementos del DOM tenemos que hacer uso de ElementRef
+   -Para hacer algo al respecto, simplemente utilizamos la variable donde capturamos la imagen con enlace roto(en este
+    caso particular).Al ya tener premeditado que el error puede ser que el enlace de imagen esta roto, accedemos a la propiedad src de esa variable
+    y le asignamos un valor por defecto.De esta forma se carga este valor si el original presenta problemas      
+   

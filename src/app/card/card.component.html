@@ -1,0 +1,16 @@
+<div>
+  <div  class="col mt-4 ml-4 bg-light card text-left w-50 h-50">
+    <div class="card-body">
+      <h4 class="card-title"><b>Nombre: </b> {{ props.name }}</h4>
+      <h5 class="card-title"><b>Descripcion: </b> {{  props.description}} </h5>
+      <h5 class="card-title"><b>Autor: </b>{{  props.user.name}} </h5>
+    </div>
+    <div class="card-body">
+      <img appBrokenImg style="width: 100px;" [src]="imgURL" alt="">
+    </div>
+  </div>
+  <div class="col mt-2">
+    <button (click)="sendDataToFav()" class="btn btn-primary">Agregar a Favoritos</button>
+    <button  (click)="sendDataToDetails()" class="btn btn-warning">Ver Detalles</button>
+  </div>
+</div>
